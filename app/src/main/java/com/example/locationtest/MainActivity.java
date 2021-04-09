@@ -1,5 +1,6 @@
 package com.example.locationtest;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -23,26 +24,24 @@ import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.GeoDataClient;
-import com.google.android.gms.location.places.PlaceDetectionClient;
-import com.google.android.gms.location.places.Places;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    private GeoDataClient mGeoDataClient;
-    private PlaceDetectionClient mPlaceDetectionClient;
     private static final int RC_DRIVE_PERMS = 7 ;
     private GoogleSignInClient mSignInClient;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private ArrayList<String> permissionsToRequest;
     private ArrayList<String> permissions = new ArrayList<>();
+    private ArrayList<String> permissionsRejected = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +50,17 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Initialize Places.
+        String apiKey = "AIzaSyCT5lDfBnzekVnRatTnovbRNPskp_TgAS0";
+        Places.initialize(getApplicationContext(), apiKey);
+
+        // Create a new Places client instance.
+        PlacesClient placesClient = Places.createClient(this);
+
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
+
+        permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
 
         GoogleSignInOptions options =
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
