@@ -3,6 +3,8 @@ package com.example.locationtest;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -62,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
         permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
         permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
 
+        permissionsToRequest = permissionsToRequest(permissions);
+
         GoogleSignInOptions options =
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestScopes(Drive.SCOPE_FILE)
@@ -76,6 +80,23 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+    }
+
+    private ArrayList<String> permissionsToRequest(ArrayList<String> wantedPermissions) {
+        ArrayList<String> result = new ArrayList<>();
+        for(String perm : wantedPermissions) {
+            if(!hasPermission(perm)) {
+                result.add(perm);
+            }
+        }
+         return result;
+    }
+
+    private boolean hasPermission(String perm) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return checkSelfPermission(perm) == PackageManager.PERMISSION_GRANTED;
+        }
+        return true;
     }
 
     @Override
